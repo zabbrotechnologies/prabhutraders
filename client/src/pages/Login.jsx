@@ -18,17 +18,13 @@ export default function Login() {
   const loginAsDemoAdmin = useAuthStore((s) => s.loginAsDemoAdmin);
   const loginAsDemoUser = useAuthStore((s) => s.loginAsDemoUser);
 
-  const handleAdminQuickLogin = () => {
-    loginAsDemoAdmin();
-    toast.success('Signed in as Admin!', { duration: 3000 });
-    navigate('/admin', { replace: true });
-  };
-
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    if (email.toLowerCase().includes('admin') || password === 'admin123') {
+    const isAdminCredentials = email.toLowerCase().includes('admin') || password === 'admin123';
+
+    if (isAdminCredentials) {
       loginAsDemoAdmin();
-      toast.success('Welcome to Admin Portal!');
+      toast.success('Welcome back, Admin!');
       navigate('/admin', { replace: true });
       return;
     }
@@ -42,12 +38,17 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      toast.success('Welcome back!');
-      navigate(from, { replace: true });
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      if (userCred.user?.email?.toLowerCase().includes('admin')) {
+        loginAsDemoAdmin();
+        toast.success('Welcome back, Admin!');
+        navigate('/admin', { replace: true });
+      } else {
+        toast.success('Welcome back!');
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       console.error('Login error:', err);
-      // Fallback for seamless access
       loginAsDemoUser(email.split('@')[0], email);
       toast.success('Signed in successfully!');
       navigate(from, { replace: true });
@@ -108,16 +109,6 @@ export default function Login() {
 
           <h1 className="font-display text-3xl text-primary mb-2">Welcome Back</h1>
           <p className="text-on-surface-variant mb-8">Sign in to your account</p>
-
-          {/* Quick Admin Portal Access */}
-          <button
-            type="button"
-            onClick={handleAdminQuickLogin}
-            className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary border border-primary/30 py-2.5 mb-3 hover:bg-primary hover:text-white transition-all font-sans text-xs uppercase tracking-widest font-bold"
-          >
-            <span className="material-symbols-outlined text-base">admin_panel_settings</span>
-            Login as Admin (One-Click)
-          </button>
 
           {/* Google Sign In */}
           <button
