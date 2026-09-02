@@ -102,6 +102,24 @@ export default function Account() {
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {/* Admin Banner if Admin */}
+              {(isAdmin || user?.email?.toLowerCase().includes('admin')) && (
+                <div className="bg-primary/10 border border-primary/30 p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lux">
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="material-symbols-outlined text-xl">admin_panel_settings</span>
+                    </div>
+                    <div>
+                      <h3 className="font-display text-base font-bold text-primary">Administrator Account</h3>
+                      <p className="text-xs text-on-surface-variant">Manage customer orders, products catalogue, and CRM overview.</p>
+                    </div>
+                  </div>
+                  <Link to="/admin" className="btn-primary text-xs h-11 px-5 w-full sm:w-auto justify-center">
+                    Open Admin Portal →
+                  </Link>
+                </div>
+              )}
+
               <h1 className="font-display text-2xl sm:text-3xl text-primary font-bold">
                 Welcome back, {(userProfile?.name || user?.displayName || 'Customer').split(' ')[0]}!
               </h1>

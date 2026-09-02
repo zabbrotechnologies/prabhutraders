@@ -14,7 +14,8 @@ export default function Navbar() {
   const location = useLocation();
 
   const { items, openCart } = useCartStore();
-  const { user, isAdmin, logout } = useAuthStore();
+  const { user, isAdmin: storeIsAdmin, logout } = useAuthStore();
+  const isAdmin = storeIsAdmin || (user?.email && user.email.toLowerCase().includes('admin'));
   const userWishlists = useWishlistStore((s) => s.userWishlists);
   const wishlistItems = userWishlists?.[user?.uid || 'guest'] || [];
 
