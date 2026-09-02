@@ -65,28 +65,30 @@ export default function Login() {
         prompt: 'select_account'
       });
 
-      if (auth) {
-        const result = await signInWithPopup(auth, provider);
-        const gUser = result.user;
-        toast.success(`Welcome ${gUser.displayName || ''}!`);
-        if (gUser.email?.toLowerCase().includes('admin')) {
-          loginAsDemoAdmin();
-          navigate('/admin', { replace: true });
-        } else {
-          loginAsDemoUser(gUser.displayName || gUser.email.split('@')[0], gUser.email);
-          navigate(from, { replace: true });
-        }
+      if (!auth) {
+        toast.error('Firebase Auth is not initialized.');
+        return;
+      }
+
+      const result = await signInWithPopup(auth, provider);
+      const gUser = result.user;
+      toast.success(`Welcome ${gUser.displayName || ''}!`);
+
+      if (gUser.email?.toLowerCase().includes('admin')) {
+        loginAsDemoAdmin();
+        navigate('/admin', { replace: true });
       } else {
-        loginAsDemoUser('Google User', 'google.user@example.com');
-        toast.success('Signed in with Google!');
+        loginAsDemoUser(gUser.displayName || gUser.email.split('@')[0], gUser.email);
         navigate(from, { replace: true });
       }
     } catch (err) {
-      console.warn('Google Popup login notice:', err);
-      if (err.code !== 'auth/popup-closed-by-user') {
-        loginAsDemoUser('Google User', 'google.user@example.com');
-        toast.success('Signed in with Google!');
-        navigate(from, { replace: true });
+      console.warn('Google Popup login error:', err);
+      if (err.code === 'auth/popup-closed-by-user') {
+        toast('Google sign-in was cancelled', { icon: 'ℹ️' });
+      } else if (err.code === 'auth/unauthorized-domain') {
+        toast.error('Domain not authorized in Firebase Console. Add this URL under Authentication > Authorized Domains.', { duration: 6000 });
+      } else {
+        toast.error(err.message || 'Google sign-in failed. Please try again.');
       }
     } finally {
       setLoading(false);

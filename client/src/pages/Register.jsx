@@ -52,22 +52,23 @@ export default function Register() {
         prompt: 'select_account'
       });
 
-      if (auth) {
-        const result = await signInWithPopup(auth, provider);
-        const gUser = result.user;
-        loginAsDemoUser(gUser.displayName || name || 'Customer', gUser.email);
-        toast.success(`Welcome ${gUser.displayName || ''}!`);
-        navigate('/');
-      } else {
-        loginAsDemoUser(name || 'Google User', 'google.user@example.com');
-        toast.success('Signed in with Google!');
-        navigate('/');
+      if (!auth) {
+        toast.error('Firebase Auth is not initialized.');
+        return;
       }
+
+      const result = await signInWithPopup(auth, provider);
+      const gUser = result.user;
+      loginAsDemoUser(gUser.displayName || name || 'Customer', gUser.email);
+      toast.success(`Welcome ${gUser.displayName || ''}!`);
+      navigate('/');
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        loginAsDemoUser(name || 'Google User', 'google.user@example.com');
-        toast.success('Signed in with Google!');
-        navigate('/');
+      if (err.code === 'auth/popup-closed-by-user') {
+        toast('Google sign-up was cancelled', { icon: 'ℹ️' });
+      } else if (err.code === 'auth/unauthorized-domain') {
+        toast.error('Domain not authorized in Firebase Console. Add this URL under Authentication > Settings > Authorized Domains.', { duration: 6000 });
+      } else {
+        toast.error(err.message || 'Google sign-up failed.');
       }
     } finally {
       setLoading(false);
