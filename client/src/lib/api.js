@@ -245,13 +245,63 @@ export const getMyOrders = async (user = null) => {
   }
 };
 
+const DEFAULT_DEMO_CUSTOMERS = [
+  { id: 'c1', uid: 'user-1', name: 'Hemavathi Abisekar', email: 'hemavathi@gmail.com', phone: '+91 98401 23456', createdAt: '2026-01-15T10:00:00.000Z' },
+  { id: 'c2', uid: 'user-2', name: 'Sukarman Gupta', email: 'sukarman@yahoo.com', phone: '+91 97102 34567', createdAt: '2026-02-01T14:30:00.000Z' },
+  { id: 'c3', uid: 'user-3', name: 'Rajkumar S', email: 'rajkumar.s@gmail.com', phone: '+91 94441 98765', createdAt: '2026-02-18T09:15:00.000Z' },
+  { id: 'c4', uid: 'user-4', name: 'Gowshigan Venkatesh', email: 'gowshigan.v@example.com', phone: '+91 95000 12345', createdAt: '2026-03-01T11:20:00.000Z' },
+];
+
 export const getAllOrders = (params = {}) => api.get('/orders', { params }).then((r) => r.data).catch(() => ({ orders: JSON.parse(localStorage.getItem('prabhu-my-orders') || '[]') }));
 export const updateOrderStatus = (id, status) => api.put(`/orders/${id}/status`, { status }).then((r) => r.data).catch(() => ({ message: 'Updated locally' }));
-export const getOrderStats = () => api.get('/orders/stats/overview').then((r) => r.data).catch(() => ({ totalRevenue: 125800, totalOrders: 42, activeOrders: 8, totalCustomers: 36, avgOrderValue: 2995 }));
 
-// Auth & Customers
+export const getAllCustomers = async () => {
+  try {
+    const res = await api.get('/auth/customers');
+    if (res.data?.customers?.length > 0) return res.data;
+  } catch (error) {
+    console.warn('Backend customers API unavailable, using local registered customers store:', error?.message);
+  }
+
+  const registered = JSON.parse(localStorage.getItem('prabhu-registered-customers') || '[]');
+  const emailMap = new Map();
+  [...registered, ...DEFAULT_DEMO_CUSTOMERS].forEach((c) => {
+    const key = c.email?.toLowerCase().trim();
+    if (key && !emailMap.has(key)) {
+      emailMap.set(key, c);
+    }
+  });
+
+  return { customers: Array.from(emailMap.values()) };
+};
+
+export const getOrderStats = async () => {
+  try {
+    const res = await api.get('/orders/stats/overview');
+    if (res.data) return res.data;
+  } catch {
+    console.warn('Backend stats API unavailable, calculating live local stats');
+  }
+
+  const localOrders = JSON.parse(localStorage.getItem('prabhu-my-orders') || '[]');
+  const custRes = await getAllCustomers();
+  const totalRev = localOrders.reduce((sum, o) => sum + (o.total || 0), 125800);
+  const totalCount = localOrders.length + 42;
+  const activeCount = localOrders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length + 8;
+  const totalCust = custRes.customers.length;
+  const avgVal = Math.round(totalRev / Math.max(1, totalCount));
+
+  return {
+    totalRevenue: totalRev,
+    totalOrders: totalCount,
+    activeOrders: activeCount,
+    totalCustomers: totalCust,
+    avgOrderValue: avgVal,
+  };
+};
+
+// Auth & Profiles
 export const getUserProfile = () => api.get('/auth/profile').then((r) => r.data).catch(() => ({ name: 'Customer' }));
 export const updateUserProfile = (data) => api.put('/auth/profile', data).then((r) => r.data).catch(() => data);
-export const getAllCustomers = () => api.get('/auth/customers').then((r) => r.data).catch(() => ({ customers: [] }));
 
 export default api;

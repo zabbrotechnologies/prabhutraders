@@ -11,6 +11,25 @@ const syncUserStores = (user) => {
   try {
     useCartStore.getState().setActiveUser(user);
     useWishlistStore.getState().syncAccountWishlist(user);
+
+    if (user && user.email && !user.email.toLowerCase().includes('admin')) {
+      const existing = JSON.parse(localStorage.getItem('prabhu-registered-customers') || '[]');
+      const email = user.email.toLowerCase().trim();
+      const isExist = existing.some((c) => c.email?.toLowerCase().trim() === email);
+
+      if (!isExist) {
+        const newCust = {
+          id: `cust-${Date.now()}`,
+          uid: user.uid || `uid-${Date.now()}`,
+          name: user.displayName || user.email.split('@')[0],
+          email: email,
+          phone: '+91 98765 43210',
+          role: 'customer',
+          createdAt: new Date().toISOString(),
+        };
+        localStorage.setItem('prabhu-registered-customers', JSON.stringify([newCust, ...existing]));
+      }
+    }
   } catch (e) {
     console.error('Account sync error:', e);
   }

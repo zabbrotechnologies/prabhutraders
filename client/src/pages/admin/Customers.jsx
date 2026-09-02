@@ -22,7 +22,10 @@ export default function AdminCustomers() {
 
   // Merge order stats into customers
   const enrichedCustomers = customers.map((c) => {
-    const custOrders = orders.filter((o) => o.userId === c.uid);
+    const custEmail = c.email?.toLowerCase().trim();
+    const custOrders = orders.filter(
+      (o) => (c.uid && o.userId === c.uid) || (custEmail && o.userEmail?.toLowerCase().trim() === custEmail) || (custEmail && o.shippingAddress?.email?.toLowerCase().trim() === custEmail)
+    );
     return {
       ...c,
       orderCount: custOrders.length,

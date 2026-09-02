@@ -1,25 +1,36 @@
 /**
- * Format price in Indian Rupees
+ * Format price in Indian Rupees (Crash-Proof)
  */
 export const formatPrice = (amount) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(amount);
+  if (amount === undefined || amount === null || isNaN(Number(amount))) return '₹0';
+  try {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(Number(amount));
+  } catch {
+    return `₹${amount}`;
+  }
 };
 
 /**
- * Format date
+ * Format date safely (Crash-Proof)
  */
 export const formatDate = (dateStr) => {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  if (!dateStr) return 'Recent';
+  try {
+    const raw = dateStr?.toDate ? dateStr.toDate() : dateStr;
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return d.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return String(dateStr || '');
+  }
 };
 
 /**
