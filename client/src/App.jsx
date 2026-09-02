@@ -1,6 +1,39 @@
-import { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('App Boundary Error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-surface">
+          <span className="material-symbols-outlined text-5xl text-outline-variant mb-3">error_outline</span>
+          <h1 className="font-display text-xl text-primary font-bold mb-2">Something went wrong</h1>
+          <p className="text-xs text-on-surface-variant mb-4 font-sans max-w-sm">
+            The page encountered a temporary rendering issue on your mobile device.
+          </p>
+          <button
+            onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}
+            className="btn-primary text-xs h-10 px-5"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Layout (Loaded synchronously for instant shell)
 import Navbar from './components/Navbar.jsx';
@@ -45,9 +78,11 @@ function PublicLayout({ children }) {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow">
-        <Suspense fallback={<PageLoader />}>
-          {children}
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            {children}
+          </Suspense>
+        </ErrorBoundary>
       </main>
       <Footer />
       <CartDrawer />
@@ -59,9 +94,11 @@ function PublicLayout({ children }) {
 function CheckoutLayout({ children }) {
   return (
     <div className="min-h-screen">
-      <Suspense fallback={<PageLoader />}>
-        {children}
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          {children}
+        </Suspense>
+      </ErrorBoundary>
       <CartDrawer />
     </div>
   );
