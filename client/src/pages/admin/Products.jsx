@@ -52,32 +52,77 @@ export default function AdminProducts() {
     setModalOpen(true);
   };
 
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    files.forEach((file) => {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image file.`);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Url = event.target.result;
+        setForm((prev) => {
+          const currentImgs = prev.images.filter(Boolean);
+          return { ...prev, images: [...currentImgs, base64Url] };
+        });
+        toast.success(`Uploaded ${file.name}!`);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
+
+    if (!form.name.trim()) {
+      toast.error('Please enter a product name.');
+      return;
+    }
+    if (!form.price || isNaN(parseFloat(form.price))) {
+      toast.error('Please enter a valid price.');
+      return;
+    }
+
     setSaving(true);
     try {
+      const validImages = form.images.filter((img) => img && img.trim() !== '');
+      const finalImages = validImages.length > 0 ? validImages : ['https://placehold.co/600x700/f4f3f1/7e7576?text=MAXYWALK'];
+
       const data = {
         ...form,
+        name: form.name.trim(),
+        description: form.description?.trim() || 'Handcrafted luxury leather product from MAXYWALK.',
+        category: form.category || 'slippers',
         price: parseFloat(form.price),
         originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
-        colors: typeof form.colors === 'string' ? form.colors.split(',').map((c) => c.trim()).filter(Boolean) : form.colors,
-        images: form.images.filter(Boolean),
-        stock: parseInt(form.stock),
+        colors: typeof form.colors === 'string' ? form.colors.split(',').map((c) => c.trim()).filter(Boolean) : (form.colors || ['Black']),
+        sizes: form.sizes?.length ? form.sizes : ['6', '7', '8', '9', '10'],
+        images: finalImages,
+        stock: isNaN(parseInt(form.stock)) ? 10 : parseInt(form.stock),
+        material: form.material || 'Full-Grain Leather',
         badge: form.badge || null,
+        featured: !!form.featured,
       };
 
       if (editProduct) {
         await updateProduct(editProduct.id, data);
-        setProducts((prev) => prev.map((p) => p.id === editProduct.id ? { ...p, ...data } : p));
-        toast.success('Product updated!');
+        setProducts((prev) => prev.map((p) => (p.id === editProduct.id ? { ...p, ...data } : p)));
+        toast.success('Product updated successfully!');
       } else {
         const created = await createProduct(data);
         setProducts((prev) => [created, ...prev]);
-        toast.success('Product added!');
+        toast.success('Product added successfully!');
       }
       setModalOpen(false);
-    } catch { toast.error('Failed to save product.'); }
-    finally { setSaving(false); }
+    } catch (err) {
+      console.error('Save product error:', err);
+      toast.error('Failed to save product. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -235,16 +280,86 @@ export default function AdminProducts() {
                 <input type="text" value={typeof form.colors === 'string' ? form.colors : form.colors?.join(', ')} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="Cognac Brown, Black, Tan" className="w-full border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:border-primary" />
               </div>
 
-              {/* Image URLs */}
+              {/* Product Images (Local File Upload + URL Input) */}
               <div>
-                <label className="font-sans text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2">Image URLs</label>
-                {form.images.map((url, i) => (
-                  <div key={i} className="flex gap-2 mb-2">
-                    <input type="url" value={url} onChange={(e) => { const imgs = [...form.images]; imgs[i] = e.target.value; setForm({ ...form, images: imgs }); }} placeholder="https://..." className="flex-1 border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:border-primary" />
-                    {form.images.length > 1 && <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })} className="text-error hover:text-error/70"><span className="material-symbols-outlined text-sm">close</span></button>}
+                <label className="font-sans text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">
+                  Product Images (Upload from Computer / Local Storage or Enter Image URL)
+                </label>
+
+                {/* Local Storage File Input Trigger */}
+                <div className="mb-3">
+                  <label className="flex flex-col sm:flex-row items-center justify-center gap-3 border-2 border-dashed border-outline-variant hover:border-primary p-4 cursor-pointer bg-surface-container-low transition-colors rounded-2xl group">
+                    <span className="material-symbols-outlined text-secondary text-3xl group-hover:scale-110 transition-transform">cloud_upload</span>
+                    <div className="text-center sm:text-left">
+                      <span className="font-sans text-xs font-bold text-primary block">Click here to upload image files from your computer / phone</span>
+                      <span className="text-[10px] text-on-surface-variant">PNG, JPG, WEBP supported (Multiple files allowed)</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* Thumbnail Previews */}
+                {form.images.filter(Boolean).length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
+                    {form.images.filter(Boolean).map((img, idx) => (
+                      <div key={idx} className="relative aspect-square border border-outline-variant rounded-xl overflow-hidden group bg-surface-container">
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                        {idx === 0 && (
+                          <span className="absolute top-1 left-1 bg-primary text-white text-[9px] font-sans uppercase px-1.5 py-0.5 rounded shadow-sm font-bold">Main</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, images: f.images.filter((_, j) => j !== idx) }))}
+                          className="absolute top-1 right-1 w-6 h-6 bg-error text-white rounded-full flex items-center justify-center opacity-90 hover:opacity-100 shadow-md transition-opacity"
+                        >
+                          <span className="material-symbols-outlined text-xs">close</span>
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                <button type="button" onClick={() => setForm({ ...form, images: [...form.images, ''] })} className="text-xs text-secondary underline">+ Add Image URL</button>
+                )}
+
+                {/* Direct Image URL input */}
+                <div className="space-y-2 pt-1">
+                  <span className="text-[11px] text-on-surface-variant block font-bold">Or enter Image Web URLs:</span>
+                  {form.images.map((url, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={url}
+                        onChange={(e) => {
+                          const imgs = [...form.images];
+                          imgs[i] = e.target.value;
+                          setForm({ ...form, images: imgs });
+                        }}
+                        placeholder="https://..."
+                        className="flex-1 border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      />
+                      {form.images.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })}
+                          className="text-error hover:text-error/70"
+                        >
+                          <span className="material-symbols-outlined text-sm">close</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, images: [...form.images, ''] })}
+                    className="text-xs text-secondary font-bold underline"
+                  >
+                    + Add Image URL Line
+                  </button>
+                </div>
               </div>
 
               {/* Badge + Featured */}

@@ -95,8 +95,17 @@ const FALLBACK_PRODUCTS = [
   },
 ];
 
+function getCustomProducts() {
+  try {
+    return JSON.parse(localStorage.getItem('prabhu-custom-products') || '[]');
+  } catch {
+    return [];
+  }
+}
+
 function filterFallbackProducts(params = {}) {
-  let list = [...FALLBACK_PRODUCTS];
+  const custom = getCustomProducts();
+  let list = [...custom, ...FALLBACK_PRODUCTS];
   const { category, featured, sort } = params;
 
   if (category && category !== 'all') {
@@ -149,27 +158,56 @@ export const getProduct = async (id) => {
     console.warn(`Backend API unavailable for product ${id}, using fallback:`, error.message);
   }
 
-  const fallback = FALLBACK_PRODUCTS.find((p) => p.id === id) || FALLBACK_PRODUCTS[0];
+  const custom = getCustomProducts();
+  const allProds = [...custom, ...FALLBACK_PRODUCTS];
+  const fallback = allProds.find((p) => p.id === id) || allProds[0];
   setCached(cacheKey, fallback);
   return fallback;
 };
 
 export const createProduct = async (data) => {
   clearApiCache();
-  const res = await api.post('/products', data);
-  return res.data;
+  try {
+    const res = await api.post('/products', data);
+    return res.data;
+  } catch (error) {
+    console.warn('Backend API unavailable for createProduct, using local storage:', error.message);
+    const newProduct = {
+      id: `custom-${Date.now()}`,
+      ...data,
+      createdAt: new Date().toISOString(),
+    };
+    const custom = getCustomProducts();
+    localStorage.setItem('prabhu-custom-products', JSON.stringify([newProduct, ...custom]));
+    return newProduct;
+  }
 };
 
 export const updateProduct = async (id, data) => {
   clearApiCache();
-  const res = await api.put(`/products/${id}`, data);
-  return res.data;
+  try {
+    const res = await api.put(`/products/${id}`, data);
+    return res.data;
+  } catch (error) {
+    console.warn(`Backend API unavailable for updateProduct ${id}, using local storage:`, error.message);
+    const custom = getCustomProducts();
+    const updatedCustom = custom.map((p) => (p.id === id ? { ...p, ...data } : p));
+    localStorage.setItem('prabhu-custom-products', JSON.stringify(updatedCustom));
+    return { id, ...data };
+  }
 };
 
 export const deleteProduct = async (id) => {
   clearApiCache();
-  const res = await api.delete(`/products/${id}`);
-  return res.data;
+  try {
+    const res = await api.delete(`/products/${id}`);
+    return res.data;
+  } catch (error) {
+    console.warn(`Backend API unavailable for deleteProduct ${id}, using local storage:`, error.message);
+    const custom = getCustomProducts().filter((p) => p.id !== id);
+    localStorage.setItem('prabhu-custom-products', JSON.stringify(custom));
+    return { message: 'Product deleted' };
+  }
 };
 
 // Orders API
