@@ -104,14 +104,28 @@ function CheckoutLayout({ children }) {
   );
 }
 
-export default function App() {
-  const { init } = useAuthStore();
+import useCartStore from './store/cartStore.js';
+import useWishlistStore from './store/wishlistStore.js';
 
-  // Initialize Firebase auth listener once on mount
+export default function App() {
+  const { init, user } = useAuthStore();
+
+  // Initialize Firebase auth listener & cross-device storage sync listener on mount
   useEffect(() => {
     const unsubscribe = init();
+
+    const handleStorageChange = (e) => {
+      if (['prabhu-user-carts', 'prabhu-user-wishlists', 'prabhu-my-orders', 'prabhu-auth'].includes(e.key)) {
+        const currentUser = useAuthStore.getState().user;
+        useCartStore.getState().setActiveUser(currentUser);
+        useWishlistStore.getState().syncAccountWishlist(currentUser);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 

@@ -2,9 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { auth } from '../firebase.js';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import axios from 'axios';
+import useCartStore from './cartStore.js';
+import useWishlistStore from './wishlistStore.js';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5001/api' : '/api');
+
+const syncUserStores = (user) => {
+  try {
+    useCartStore.getState().setActiveUser(user);
+    useWishlistStore.getState().syncAccountWishlist(user);
+  } catch (e) {
+    console.error('Account sync error:', e);
+  }
+};
 
 const useAuthStore = create(
   persist(
@@ -17,6 +27,8 @@ const useAuthStore = create(
       // Initialize auth listener
       init: () => {
         if (!auth) {
+          const currentUser = get().user;
+          if (currentUser) syncUserStores(currentUser);
           set({ isLoading: false });
           return () => {};
         }
@@ -37,12 +49,15 @@ const useAuthStore = create(
                 isAdmin: profile.role === 'admin',
                 isLoading: false,
               });
+              syncUserStores(firebaseUser);
             } catch (err) {
               console.error('Profile sync error:', err);
               set({ user: firebaseUser, isLoading: false });
+              syncUserStores(firebaseUser);
             }
           } else {
             set({ user: null, userProfile: null, isAdmin: false, isLoading: false });
+            syncUserStores(null);
           }
         });
 
@@ -54,12 +69,14 @@ const useAuthStore = create(
         const mockAdminUser = { uid: 'admin-demo-id', email: 'admin@prabhutraders.com', displayName: 'Prabhu Admin' };
         const mockProfile = { name: 'Prabhu Admin', role: 'admin', phone: '+91 94447 43465' };
         set({ user: mockAdminUser, userProfile: mockProfile, isAdmin: true, isLoading: false });
+        syncUserStores(mockAdminUser);
         return mockAdminUser;
       },
       loginAsDemoUser: (name = 'Customer', email = 'user@example.com') => {
         const mockUser = { uid: `user-${Date.now()}`, email, displayName: name };
         const mockProfile = { name, role: 'customer', phone: '+91 98765 43210' };
         set({ user: mockUser, userProfile: mockProfile, isAdmin: false, isLoading: false });
+        syncUserStores(mockUser);
         return mockUser;
       },
 

@@ -16,8 +16,8 @@ export default function Navbar() {
   const { items, openCart } = useCartStore();
   const { user, isAdmin: storeIsAdmin, logout } = useAuthStore();
   const isAdmin = storeIsAdmin || (user?.email && user.email.toLowerCase().includes('admin'));
-  const userWishlists = useWishlistStore((s) => s.userWishlists);
-  const wishlistItems = userWishlists?.[user?.uid || 'guest'] || [];
+  const getWishlist = useWishlistStore((s) => s.getWishlist);
+  const wishlistItems = getWishlist(user);
 
   const itemCount = items.reduce((s, i) => s + (i.qty || 1), 0);
 

@@ -12,17 +12,16 @@ export default function ProductCard({ product }) {
   const { addItem, openCart } = useCartStore();
   const { user } = useAuthStore();
   const toggle = useWishlistStore((s) => s.toggle);
-  const userWishlists = useWishlistStore((s) => s.userWishlists);
+  const isWishlisted = useWishlistStore((s) => s.isWishlisted);
 
-  const uid = user?.uid || 'guest';
-  const wishlisted = (userWishlists?.[uid] || []).includes(product.id);
+  const wishlisted = isWishlisted(product.id, user);
   const hasSecondImage = product.images?.length > 1;
   const defaultSize = product.sizes?.[0] || 'Standard';
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, defaultSize, product.colors?.[0] || '', 1);
+    addItem(product, defaultSize, product.colors?.[0] || '', 1, user);
     openCart();
     toast.success(`${product.name} added to bag!`, {
       duration: 2000,
@@ -33,7 +32,7 @@ export default function ProductCard({ product }) {
   const handleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    toggle(product.id, uid);
+    toggle(product.id, user);
     toast(wishlisted ? 'Removed from wishlist' : 'Saved to wishlist', {
       icon: wishlisted ? '💔' : '❤️',
       duration: 1500,

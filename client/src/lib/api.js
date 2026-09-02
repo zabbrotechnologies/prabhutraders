@@ -210,7 +210,6 @@ export const deleteProduct = async (id) => {
   }
 };
 
-// Orders API
 export const placeOrder = async (data) => {
   try {
     const res = await api.post('/orders', data);
@@ -218,20 +217,31 @@ export const placeOrder = async (data) => {
   } catch (error) {
     console.warn('Backend order API unavailable, using offline fallback:', error.message);
     const orderId = `PT-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substr(2, 3).toUpperCase()}`;
-    const mockOrder = { id: `mock-${Date.now()}`, orderId, ...data, createdAt: new Date().toISOString() };
+    const mockOrder = {
+      id: `mock-${Date.now()}`,
+      orderId,
+      ...data,
+      userEmail: data.shippingAddress?.email?.toLowerCase().trim() || 'guest',
+      createdAt: new Date().toISOString(),
+    };
     const saved = JSON.parse(localStorage.getItem('prabhu-my-orders') || '[]');
     localStorage.setItem('prabhu-my-orders', JSON.stringify([mockOrder, ...saved]));
     return mockOrder;
   }
 };
 
-export const getMyOrders = async () => {
+export const getMyOrders = async (user = null) => {
   try {
     const res = await api.get('/orders/my');
     return res.data;
   } catch {
     const localOrders = JSON.parse(localStorage.getItem('prabhu-my-orders') || '[]');
-    return { orders: localOrders };
+    if (!user || !user.email) return { orders: localOrders };
+    const userEmail = user.email.toLowerCase().trim();
+    const userOrders = localOrders.filter(
+      (o) => !o.userEmail || o.userEmail === userEmail || o.shippingAddress?.email?.toLowerCase().trim() === userEmail
+    );
+    return { orders: userOrders };
   }
 };
 

@@ -21,8 +21,8 @@ export default function Account() {
   const [wishlistProducts, setWishlistProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user, userProfile, setUserProfile, logout } = useAuthStore();
-  const userWishlists = useWishlistStore((s) => s.userWishlists);
-  const wishlistIds = userWishlists?.[user?.uid || 'guest'] || [];
+  const getWishlist = useWishlistStore((s) => s.getWishlist);
+  const wishlistIds = getWishlist(user);
   const wishlistKey = wishlistIds.join(',');
   const [editName, setEditName] = useState(userProfile?.name || user?.displayName || '');
   const [editPhone, setEditPhone] = useState(userProfile?.phone || '');
@@ -38,12 +38,12 @@ export default function Account() {
   useEffect(() => {
     if (activeTab === 'orders' || activeTab === 'overview') {
       setLoading(true);
-      getMyOrders().then((d) => setOrders(d.orders || [])).catch(() => setOrders([])).finally(() => setLoading(false));
+      getMyOrders(user).then((d) => setOrders(d.orders || [])).catch(() => setOrders([])).finally(() => setLoading(false));
     }
     if (activeTab === 'wishlist' && wishlistIds.length > 0) {
-      getProducts({ limit: 20 }).then((d) => setWishlistProducts((d.products || []).filter((p) => wishlistIds.includes(p.id)))).catch(() => setWishlistProducts([]));
+      getProducts({ limit: 50 }).then((d) => setWishlistProducts((d.products || []).filter((p) => wishlistIds.includes(p.id)))).catch(() => setWishlistProducts([]));
     }
-  }, [activeTab, wishlistKey]);
+  }, [activeTab, wishlistKey, user]);
 
   const handleTabChange = (tab) => { setActiveTab(tab); setSearchParams({ tab }); };
 

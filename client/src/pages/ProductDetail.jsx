@@ -50,7 +50,7 @@ export default function ProductDetail() {
       toast.error('Please choose a size', { duration: 2000 });
       return;
     }
-    addItem(product, selectedSize, selectedColor, qty);
+    addItem(product, selectedSize, selectedColor, qty, user);
     openCart();
     toast.success('Added to your shopping bag!', { duration: 2000 });
   };
@@ -245,15 +245,15 @@ export default function ProductDetail() {
                   {product.stock === 0 ? 'Out of Stock' : 'Add to Bag'}
                 </button>
                 <button
-                  onClick={() => toggle(product.id, uid)}
+                  onClick={() => toggle(product.id, user)}
                   className={`w-12 h-12 border flex items-center justify-center transition-all bg-white ${
-                    isWishlisted(product.id, uid) ? 'border-secondary bg-secondary/5' : 'border-outline-variant hover:border-secondary'
+                    isWishlisted(product.id, user) ? 'border-secondary bg-secondary/5' : 'border-outline-variant hover:border-secondary'
                   }`}
                   aria-label="Wishlist"
                 >
                   <span
                     className="material-symbols-outlined"
-                    style={{ fontVariationSettings: isWishlisted(product.id, uid) ? "'FILL' 1" : "'FILL' 0", color: isWishlisted(product.id, uid) ? '#934b19' : '#1a1c1b' }}
+                    style={{ fontVariationSettings: isWishlisted(product.id, user) ? "'FILL' 1" : "'FILL' 0", color: isWishlisted(product.id, user) ? '#934b19' : '#1a1c1b' }}
                   >
                     favorite
                   </span>
