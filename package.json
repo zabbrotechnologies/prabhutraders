@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Prabhu Traders / MAXYWALK - Premium Leather E-Commerce",
   "scripts": {
+    "build": "cd client && npm run build",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",

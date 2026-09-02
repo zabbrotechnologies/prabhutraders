@@ -62,12 +62,14 @@ app.use((err, req, res, next) => {
 });
 
 // ── Start Server ────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🚀 Prabhu Traders API running at http://localhost:${PORT}`);
-  console.log(`📦 Products: http://localhost:${PORT}/api/products`);
-  console.log(`🛒 Orders: http://localhost:${PORT}/api/orders`);
-  console.log(`💳 Payments: http://localhost:${PORT}/api/payments`);
-  console.log(`\n⚡ Environment: ${process.env.NODE_ENV || 'development'}\n`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Prabhu Traders API running at http://localhost:${PORT}`);
+    console.log(`📦 Products: http://localhost:${PORT}/api/products`);
+    console.log(`🛒 Orders: http://localhost:${PORT}/api/orders`);
+    console.log(`💳 Payments: http://localhost:${PORT}/api/payments`);
+    console.log(`\n⚡ Environment: ${process.env.NODE_ENV || 'development'}\n`);
+  });
+}
 
 export default app;
