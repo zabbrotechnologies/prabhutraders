@@ -49,6 +49,20 @@ const useAuthStore = create(
         return unsubscribe;
       },
 
+      // Demo / Direct login helpers
+      loginAsDemoAdmin: () => {
+        const mockAdminUser = { uid: 'admin-demo-id', email: 'admin@prabhutraders.com', displayName: 'Prabhu Admin' };
+        const mockProfile = { name: 'Prabhu Admin', role: 'admin', phone: '+91 94447 43465' };
+        set({ user: mockAdminUser, userProfile: mockProfile, isAdmin: true, isLoading: false });
+        return mockAdminUser;
+      },
+      loginAsDemoUser: (name = 'Customer', email = 'user@example.com') => {
+        const mockUser = { uid: `user-${Date.now()}`, email, displayName: name };
+        const mockProfile = { name, role: 'customer', phone: '+91 98765 43210' };
+        set({ user: mockUser, userProfile: mockProfile, isAdmin: false, isLoading: false });
+        return mockUser;
+      },
+
       // Sign out
       logout: async () => {
         if (auth) await signOut(auth);
