@@ -1,0 +1,412 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════
+   PRABHU TRADERS / MAXYWALK — Heritage Leather Warm Palette
+   Color System from Designer Specimen:
+   - Primary: #472718 (Rich Espresso Leather)
+   - Secondary: #A95A2A (Warm Cognac Terracotta)
+   - Tertiary: #321B11 (Dark Leather Bark)
+   - Neutral / Background: #F8F0E2 (Warm Cream / Parchment)
+   - Font Headline: Playfair Display
+   - Font Body/Label: Manrope
+═══════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Colors ── */
+  --color-primary: #472718;
+  --color-secondary: #A95A2A;
+  --color-tertiary: #321B11;
+  --color-background: #F8F0E2;
+  --color-surface: #F8F0E2;
+  --color-surface-bright: #FCF8F2;
+  --color-surface-dim: #EBDDC6;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-low: #F3E8D7;
+  --color-surface-container: #EBDDC6;
+  --color-surface-container-high: #E2D2B8;
+  --color-surface-container-highest: #D9C7AA;
+  --color-surface-tint: #5C3522;
+  --color-surface-variant: #E8DAC4;
+  --color-on-surface: #2D1910;
+  --color-on-surface-variant: #5C4538;
+  --color-outline: #8E7D6F;
+  --color-outline-variant: #D0BEAC;
+  --color-on-background: #2D1910;
+  --color-on-primary: #FFFFFF;
+  --color-on-primary-container: #EAD8CE;
+  --color-primary-container: #321B11;
+  --color-primary-fixed: #EEDCCE;
+  --color-primary-fixed-dim: #D5BDAE;
+  --color-on-primary-fixed: #321B11;
+  --color-on-primary-fixed-variant: #472718;
+  --color-inverse-primary: #D5BDAE;
+  --color-inverse-surface: #2D1910;
+  --color-inverse-on-surface: #F8F0E2;
+  --color-secondary-container: #C87541;
+  --color-secondary-fixed: #F9DEC9;
+  --color-secondary-fixed-dim: #E6BFA6;
+  --color-on-secondary: #FFFFFF;
+  --color-on-secondary-container: #4A1E04;
+  --color-on-secondary-fixed: #321200;
+  --color-on-secondary-fixed-variant: #6E320A;
+  --color-tertiary-container: #24130A;
+  --color-tertiary-fixed: #E8D9D0;
+  --color-tertiary-fixed-dim: #C5B0A4;
+  --color-on-tertiary: #FFFFFF;
+  --color-on-tertiary-container: #D2BEB3;
+  --color-on-tertiary-fixed: #321B11;
+  --color-on-tertiary-fixed-variant: #4A281A;
+  --color-error: #BA1A1A;
+  --color-error-container: #FFDAD6;
+  --color-on-error: #FFFFFF;
+  --color-on-error-container: #93000A;
+
+  /* ── Typography ── */
+  --font-display: 'Playfair Display', serif;
+  --font-sans: 'Manrope', 'Plus Jakarta Sans', sans-serif;
+
+  /* ── Border Radius ── */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* ── Max Width ── */
+  --width-container: 1440px;
+
+  /* ── Box Shadow ── */
+  --shadow-lux: 0px 10px 30px rgba(71, 39, 24, 0.07);
+  --shadow-lux-md: 0px 6px 20px rgba(71, 39, 24, 0.10);
+  --shadow-warm: 0px 4px 16px rgba(169, 90, 42, 0.12);
+}
+
+/* ════════════════════════════════════════════════════════════
+   BASE STYLES
+════════════════════════════════════════════════════════════ */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-secondary);
+    color: #ffffff;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  input, textarea, select {
+    font-family: inherit;
+    max-width: 100%;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--color-background); }
+  ::-webkit-scrollbar-thumb { background-color: var(--color-outline-variant); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background-color: var(--color-secondary); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   HIGH-CONTRAST & CLEAR BUTTON STYLES
+════════════════════════════════════════════════════════════ */
+@layer components {
+  /* ── Layout ── */
+  .container-max {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-max {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  /* ── Primary Button (Solid Espresso Brown with Pure White Crisp Text) ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #472718 !important;
+    color: #FFFFFF !important;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+    height: 3.25rem;
+    border-radius: 9999px;
+    border: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(71, 39, 24, 0.3);
+  }
+
+  .btn-primary:hover {
+    background-color: #321B11 !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(71, 39, 24, 0.4);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── Secondary Button (Warm Cream Background with Deep Brown Crisp Text) ── */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #EBDDC6 !important;
+    color: #472718 !important;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+    height: 3.25rem;
+    border-radius: 9999px;
+    border: 1.5px solid #AFA090 !important;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-secondary:hover {
+    background-color: #DFCEB5 !important;
+    border-color: #472718 !important;
+    color: #472718 !important;
+  }
+
+  /* ── Hero Frosted White Button (High-Contrast White on Dark Banner) ── */
+  .btn-hero-glass {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(10px);
+    color: #FFFFFF !important;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+    height: 3.25rem;
+    border-radius: 9999px;
+    border: 2px solid #FFFFFF !important;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    text-decoration: none;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-hero-glass:hover {
+    background-color: #FFFFFF !important;
+    color: #472718 !important;
+    text-shadow: none;
+  }
+
+  /* ── Outlined Button (Transparent with Thick Espresso Border & Text) ── */
+  .btn-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent !important;
+    color: #472718 !important;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+    height: 3.25rem;
+    border-radius: 9999px;
+    border: 2px solid #472718 !important;
+    transition: all 0.25s ease;
+  }
+
+  .btn-outlined:hover {
+    background-color: #472718 !important;
+    color: #FFFFFF !important;
+  }
+
+  /* ── Icon Button ── */
+  .btn-icon {
+    padding: 0.5rem;
+    color: #472718;
+    background: none;
+    border: none;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn-icon:hover {
+    color: #A95A2A;
+    background-color: var(--color-surface-container);
+  }
+
+  /* ── Inputs ── */
+  .input-hairline {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1.5px solid #D0BEAC;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: #2D1910;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .input-hairline::placeholder {
+    color: #8E7D6F;
+  }
+
+  .input-hairline:focus {
+    outline: none;
+    border-color: #472718;
+    box-shadow: 0 0 0 3px rgba(71, 39, 24, 0.12);
+  }
+
+  /* ── Typography helpers ── */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .text-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #A95A2A;
+  }
+
+  /* ── Cards ── */
+  .card-lux {
+    background-color: #FFFFFF;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lux);
+    overflow: hidden;
+  }
+
+  /* ── Animations ── */
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .page-enter {
+    animation: pageIn 0.3s ease-out forwards;
+  }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Skeleton loading ── */
+  .skeleton {
+    background-color: var(--color-surface-container-high);
+    border-radius: 12px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ── Admin nav item ── */
+  .admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #5C4538;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .admin-nav-item:hover {
+    background-color: var(--color-surface-container);
+    color: #472718;
+  }
+
+  .admin-nav-item.active {
+    background-color: #472718;
+    color: #FFFFFF;
+    font-weight: 800;
+  }
+}
