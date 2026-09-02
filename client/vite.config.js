@@ -4,8 +4,12 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   envDir: '../',
-  base: process.env.VITE_BASE_PATH || '/',
+  base: '/',
   plugins: [react()],
+  server: {
+    host: true,
+    port: 5173,
+  },
   build: {
     target: 'esnext',
     chunkSizeWarningLimit: 1000,
