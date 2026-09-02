@@ -28,10 +28,11 @@ export default function AdminOrders() {
   }, [fetchOrders]);
 
   const handleStatusUpdate = async (orderId, docId, newStatus) => {
-    setUpdating(docId);
+    const targetId = docId || orderId;
+    setUpdating(targetId);
     try {
-      await updateOrderStatus(docId, newStatus);
-      setOrders((prev) => prev.map((o) => (o.id === docId ? { ...o, status: newStatus } : o)));
+      await updateOrderStatus(targetId, newStatus);
+      setOrders((prev) => prev.map((o) => (o.id === targetId || o.orderId === orderId ? { ...o, status: newStatus } : o)));
       toast.success(`Order ${orderId} status set to: ${newStatus}`);
     } catch {
       toast.error('Failed to update status.');
