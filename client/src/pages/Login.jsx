@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase.js';
+import useAuthStore from '../store/authStore.js';
 import toast from 'react-hot-toast';
 
 export default function Login() {

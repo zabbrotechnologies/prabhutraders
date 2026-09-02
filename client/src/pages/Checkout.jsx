@@ -42,18 +42,32 @@ export default function Checkout() {
   const isPhoneValid = (p) => /^[6-9]\d{9}$/.test((p || '').replace(/[^0-9]/g, ''));
   const isPincodeValid = (pin) => /^\d{6}$/.test((pin || '').trim());
 
-  const isStep0Valid =
-    isEmailValid(contact.email) &&
-    isPhoneValid(contact.phone) &&
-    address.firstName?.trim() &&
-    address.address?.trim() &&
-    address.city?.trim() &&
-    isPincodeValid(address.pincode);
-
   const handleNext = () => {
-    if (step === 0 && !isStep0Valid) {
-      toast.error('Please enter valid contact and address details.');
-      return;
+    if (step === 0) {
+      if (!contact.email || !isEmailValid(contact.email)) {
+        toast.error('Please enter a valid email address above.');
+        return;
+      }
+      if (!contact.phone || !isPhoneValid(contact.phone)) {
+        toast.error('Please enter a valid 10-digit mobile number above.');
+        return;
+      }
+      if (!address.firstName?.trim()) {
+        toast.error('Please enter your First Name.');
+        return;
+      }
+      if (!address.address?.trim()) {
+        toast.error('Please enter your House / Street / Landmark address.');
+        return;
+      }
+      if (!address.city?.trim()) {
+        toast.error('Please enter your City.');
+        return;
+      }
+      if (!address.pincode || !isPincodeValid(address.pincode)) {
+        toast.error('Please enter a valid 6-digit Pincode.');
+        return;
+      }
     }
     setStep((s) => Math.min(s + 1, 2));
   };
@@ -275,7 +289,7 @@ export default function Checkout() {
                 </section>
 
                 <div className="pt-2 flex flex-col sm:flex-row justify-between gap-3">
-                  <button onClick={handleNext} className="btn-primary w-full sm:w-auto justify-center text-xs h-12 order-1 sm:order-2" disabled={!isStep0Valid}>
+                  <button onClick={handleNext} className="btn-primary w-full sm:w-auto justify-center text-xs h-12 order-1 sm:order-2">
                     Continue to Delivery
                   </button>
                   <Link to="/shop" className="text-xs text-on-surface-variant hover:text-primary font-sans text-center py-2 order-2 sm:order-1">← Return to Shop</Link>

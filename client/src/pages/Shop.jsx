@@ -283,7 +283,7 @@ export default function Shop() {
           {/* Product Grid - Stacked 1 by 1 on Mobile */}
           <div className="flex-grow w-full">
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="p-3 border border-outline-variant/20 bg-white">
                     <div className="aspect-[4/5] skeleton mb-3" />
@@ -300,7 +300,7 @@ export default function Shop() {
                 <button onClick={clearAll} className="btn-primary text-xs h-11">Clear All Filters</button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6">
                 {products.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}

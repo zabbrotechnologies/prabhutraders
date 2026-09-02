@@ -284,7 +284,7 @@ export default function Home() {
           </div>
 
           {loadingProducts ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="p-2">
                   <div className="aspect-[4/5] skeleton mb-4" />
@@ -294,7 +294,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
               {featuredProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
